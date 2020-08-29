@@ -2,13 +2,19 @@
 #include "Pitch_Detector.h";
 
 Trill trillSensor;
+
+int pressureSensorPin = A6;
 int counter = 0;
 bool touchSwitches[30];
+
+
 
 Pitch_Detector pitchDetector;
 
 void setup()
 {
+  pinMode(pressureSensorPin, INPUT);
+  
   Serial.begin(115200);
   int ret = trillSensor.begin(Trill::TRILL_CRAFT);
 
@@ -57,7 +63,14 @@ void loop() {
       }
     }
 
-    Serial.println(pitchDetector.getStringPitch(touchSwitches, 15, 24));
-    
-  }  
+    int stringPitchHz = pitchDetector.getStringPitch(touchSwitches, 15, 24);
+
+    if(stringPitchHz != -1)
+    {
+      Serial.println(stringPitchHz);
+    }
+  }
+
+
+  Serial.println(analogRead(pressureSensorPin));
 }
