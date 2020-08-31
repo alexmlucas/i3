@@ -22,8 +22,8 @@
  
  ************************************************************************/
 
-#ifndef faust_Bowed_Violin_h_
-#define faust_Bowed_Violin_h_
+#ifndef faust_Violin_h_
+#define faust_Violin_h_
 
 #include <string>
 
@@ -38,12 +38,12 @@ class MidiUI;
 class teensy_midi;
 #endif
 
-class Bowed_Violin : public AudioStream
+class Violin : public AudioStream
 {
     public:
     
-        Bowed_Violin();
-        ~Bowed_Violin();
+        Violin();
+        ~Violin();
     
         virtual void update(void);
     

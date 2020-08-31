@@ -1,36 +1,33 @@
 #include <Trill.h>
 #include<Audio.h>
-#include "Bowed_Violin.h"
-#include "Plucked_Violin.h"
 
-Bowed_Violin bowedViolin;
-Plucked_Violin pluckedViolin;
+#include "Violin.h"
+
+Violin violin;
 Trill trillSensor;
 elapsedMillis touchReadTimer;
-elapsedMillis triggerTimer;
+elapsedMillis pluckResetTimer; 
 
-boolean triggerToggle = false;
+boolean pressureWasApplied = false;
+boolean touchWasPresent = false;
 boolean pressureActive = false;
-boolean touchActive = false; 
+boolean pluckResetRequired = false;
 int pressureSensorPin = A8;
 int lastPressureValue = 0;
+int maxTouchSize = 0;
 float bowPressureValue = 0;
 
-
-AudioMixer4              mixer1;         //xy=225,197
-AudioMixer4              mixer2;         //xy=223,275
-AudioOutputI2S           i2s1;           //xy=388,203
-AudioConnection          patchCord1(bowedViolin, 0, mixer1, 0);
-AudioConnection          patchCord2(pluckedViolin, 0, mixer2, 0);
-AudioConnection          patchCord3(mixer1, 0, i2s1, 1);
-AudioConnection          patchCord4(mixer2, 0, i2s1, 0);
+AudioAmplifier           amp1;          
+AudioOutputI2S           i2s1;          
+AudioConnection          patchCord1(violin, amp1);
+AudioConnection          patchCord2(amp1, 0, i2s1, 0);
+AudioConnection          patchCord3(amp1, 0, i2s1, 1);
 
 void setup()
 {
   pinMode(A8, INPUT);
   AudioMemory(2);
-  mixer1.gain(0,0.6);
-  mixer2.gain(0,0.6);
+  amp1.gain(0.6);
 
   Serial.begin(115200);
   int ret = trillSensor.begin(Trill::TRILL_BAR);
@@ -40,64 +37,71 @@ void setup()
     Serial.print("Error code: ");
     Serial.println(ret);
   }
-
-  bowedViolin.setParamValue("freq",670);
 }
 
-void loop() {
-  if(triggerTimer > 5000){
-    triggerToggle = !triggerToggle;
-    bowedViolin.setParamValue("Gate", triggerToggle);
-    triggerTimer = 0;
-  }
-
-
-  
-  // Read 20 times per second
-  
-  if(touchReadTimer > 50)
+void loop() 
+{
+  if(touchReadTimer > 50)                                                     // read 20 times per second.
   {
     
-    trillSensor.read();
-
-    if(trillSensor.getNumTouches() > 0) {
-      int touchLocation = trillSensor.touchLocation(0);
-      //Serial.print(touchLocation);
-      //Serial.print(" ");
-
-      int touchSize = trillSensor.touchSize(0);
-      
-      //Serial.print(touchSize);
-      //Serial.println("");
-
-      touchActive = true;
-
-      constrain(touchSize, 0, 3000);
-      
-      bowedViolin.setParamValue("freq", map(touchLocation, 0, 3200, 1100, 660));
-    } else if(touchActive) {
-      // Print a single line when touch goes off
-      //Serial.println("0 0");
-      
-      touchActive = false;
-      touchReadTimer = 0;   // reset the timer
-    }
-
-    int pressureValue = constrain(analogRead(pressureSensorPin), 0, 700);                       // read pressure value but clip upper end.
-
-    if(pressureValue > 200)
+    trillSensor.read();                                                       // read a value from the trill.
+  
+    if(trillSensor.getNumTouches() > 0)                                       // if we have a touch
     {
-     if(pressureValue > (lastPressureValue + 10) || pressureValue < (lastPressureValue - 10))   // filter noise
-     {
-      //Serial.println(pressureValue);
+      touchWasPresent = true;
+      int touchLocation = trillSensor.touchLocation(0);                       // get location of first touch.
+      violin.setParamValue("freq", map(touchLocation, 0, 3200, 1100, 660));   // set the frequency of the violin string
+      int currentTouchSize = constrain(trillSensor.touchSize(0), 0, 3000);    // get a constrained version of the touch size
       
-      lastPressureValue = pressureValue;
-      bowPressureValue = map(pressureValue, 200, 700, 0, 100) / 1000.0;
-      Serial.println(bowPressureValue);
+      if(currentTouchSize > maxTouchSize)                                     // if the touch size is greater than previously logged...
+      {
+        maxTouchSize = currentTouchSize;                                      // ...reset the touchsize
+        Serial.println(maxTouchSize);
+      }
       
-     }
-    }
+      int pressureValue = constrain(analogRead(pressureSensorPin), 0, 700);   // read the pressure sensor
+      
+      if(pressureValue > 200)                                                 // is pressure being applied?
+      {
+        if(pressureValue > (lastPressureValue + 10) || pressureValue < (lastPressureValue - 10))    // filter noise
+        {
+          pressureWasApplied = true;
+          lastPressureValue = pressureValue;                                                        // store value for next iteration.
+          bowPressureValue = map(pressureValue, 200, 700, 0, 100) / 1000.0;                         // map to a value appropriate for bow pressure
+          violin.setParamValue("pressure", bowPressureValue);                                       // ...and pressure of the bowed string.
+        }
+      }
+    } else
+    {
+      if(touchWasPresent && pressureWasApplied)                   // bowed action just occured
+      {
+        touchWasPresent = false;                                  // ...simply reset everything.
+        pressureWasApplied = false;
+        violin.setParamValue("pressure", 0);                     
+      }
 
-    bowedViolin.setParamValue("pressure", bowPressureValue);
+      if(touchWasPresent && !pressureWasApplied)                 // execute pluck action
+      {
+        float pluckGain = map(maxTouchSize, 0, 3000, 0, 100) / 1000.0;                         
+        violin.setParamValue("pluck_gain", pluckGain);
+        violin.setParamValue("pluck", 1);
+        pluckResetTimer = 0;
+        pluckResetRequired = true;
+        touchWasPresent = false;
+        pressureWasApplied = false;
+        maxTouchSize = 0;
+      } 
+    }
+    
+    touchReadTimer = 0;
+  }
+  
+  if(pluckResetRequired)
+  {
+    if(pluckResetTimer > 10)
+    {
+      violin.setParamValue("pluck", 0);
+      pluckResetRequired = false;
+    }
   }
 }
