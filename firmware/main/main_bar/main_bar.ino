@@ -12,7 +12,7 @@ boolean pressureWasApplied = false;
 boolean touchWasPresent = false;
 boolean pressureActive = false;
 boolean pluckResetRequired = false;
-int pressureSensorPin = A8;
+int pressureSensorPin = A3;
 int lastPressureValue = 0;
 int maxTouchSize = 0;
 float bowPressureValue = 0;
@@ -25,9 +25,9 @@ AudioConnection          patchCord3(amp1, 0, i2s1, 1);
 
 void setup()
 {
-  pinMode(A8, INPUT);
+  pinMode(A3, INPUT);
   AudioMemory(2);
-  amp1.gain(0.6);
+  amp1.gain(0.3);
 
   Serial.begin(115200);
   int ret = trillSensor.begin(Trill::TRILL_BAR);
@@ -41,6 +41,7 @@ void setup()
 
 void loop() 
 {
+  
   if(touchReadTimer > 50)                                                     // read 20 times per second.
   {
     
@@ -56,20 +57,21 @@ void loop()
       if(currentTouchSize > maxTouchSize)                                     // if the touch size is greater than previously logged...
       {
         maxTouchSize = currentTouchSize;                                      // ...reset the touchsize
-        Serial.println(maxTouchSize);
+        //Serial.println(maxTouchSize);
       }
       
-      int pressureValue = constrain(analogRead(pressureSensorPin), 0, 700);   // read the pressure sensor
+      int pressureValue = constrain(analogRead(pressureSensorPin), 0, 900);   // read the pressure sensor
       
-      if(pressureValue > 200)                                                 // is pressure being applied?
+      if(pressureValue > 20)                                                 // is pressure being applied?
       {
         if(pressureValue > (lastPressureValue + 10) || pressureValue < (lastPressureValue - 10))    // filter noise
         {
           pressureWasApplied = true;
           lastPressureValue = pressureValue;                                                        // store value for next iteration.
-          bowPressureValue = map(pressureValue, 200, 700, 0, 100) / 1000.0;                         // map to a value appropriate for bow pressure
+          bowPressureValue = pressureValue / 1000.0;                         // map to a value appropriate for bow pressure
           violin.setParamValue("pressure", bowPressureValue);                                       // ...and pressure of the bowed string.
         }
+        //Serial.println(pressureValue);
       }
     } else
     {
@@ -83,7 +85,7 @@ void loop()
       if(touchWasPresent && !pressureWasApplied)                 // execute pluck action
       {
         float pluckGain = map(maxTouchSize, 0, 3000, 0, 100) / 1000.0;                         
-        violin.setParamValue("pluck_gain", pluckGain);
+        violin.setParamValue("pluck_gain", 1);                  // fixed at 1 currently.
         violin.setParamValue("pluck", 1);
         pluckResetTimer = 0;
         pluckResetRequired = true;
