@@ -5,7 +5,7 @@
 #include "Violin.h"
 
 Trill trillSensors[4];
-int trillAddresses[] = {0x20, 0x21, 0x22, 0x23};
+int trillAddresses[] = {0x23, 0x22, 0x21, 0x20};
 const int NUM_TRILL_SENSORS = 4;
 boolean touchFlags[] = {false, false, false, false};
 boolean lastTouchFlags[] = {false, false, false, false}; 
@@ -23,6 +23,9 @@ elapsedMillis sensorReadTimer;
 
 boolean pluckResetFlags[] = {false, false, false, false};
 elapsedMillis pluckResetTimers[] = {0, 0, 0, 0};
+
+float minStringFreqs[] = {196.00, 293.70, 440.00, 659.30};                // G3, D4, A4, E5 
+float maxStringFreqs[] = {277.18, 415.30, 622.25, 932.33};                // Db4, Ab4, Eb5, Bb5
 
 Violin violin;
 
@@ -73,18 +76,18 @@ void loop()
 
       if(trillSensors[i].getNumTouches() > 0)
       {
-        /*Serial.print("Touch at Trill address ");
+        Serial.print("Touch at Trill address ");
         Serial.print(trillAddresses[i]);
         Serial.print(" = ");
-        Serial.println(trillSensors[i].touchLocation(0));*/
+        Serial.println(trillSensors[i].touchLocation(0));
 
         touchFlags[i] = true;
-        touchLocations[i] = trillSensors[i].touchLocation(0);                                   // get the location of the first touch.
-        violin.setParamValue(freqParamNames[i], map(touchLocations[i], 0, 3200, 1100, 660));    // set string frequency.
+        touchLocations[i] = trillSensors[i].touchLocation(0);                                                             // get the location of the first touch.
+        violin.setParamValue(freqParamNames[i], map(touchLocations[i], 0, 3200, maxStringFreqs[i], minStringFreqs[i]));   // set string frequency.
 
-        int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);                // get a constrained version of the touch size
+        int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);                                          // get a constrained version of the touch size
 
-        if(currentTouchSize > maxTouchSizes[i])                                                 // get the largest touch size during this touch event.
+        if(currentTouchSize > maxTouchSizes[i])                                                                           // get the largest touch size during this touch event.
         {
           maxTouchSizes[i] = currentTouchSize;
           Serial.println(maxTouchSizes[i]);                            
