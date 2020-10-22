@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------
-name: "violin"
+name: "Violin"
 Code generated with Faust 2.28.0 (https://faust.grame.fr)
 Compilation options: -lang cpp -scal -ftz 0
 ------------------------------------------------------------ */
@@ -42,7 +42,7 @@ Compilation options: -lang cpp -scal -ftz 0
  ************************************************************************
  ************************************************************************/
 
-#include "violin.h"
+#include "Violin.h"
 
 // IMPORTANT: in order for MapUI to work, the teensy linker must be g++
 /************************** BEGIN MapUI.h **************************/
@@ -8040,7 +8040,7 @@ class mydsp : public dsp {
 		m->declare("envelopes.lib/license", "LGPL with exception");
 		m->declare("envelopes.lib/name", "Faust Envelope Library");
 		m->declare("envelopes.lib/version", "0.1");
-		m->declare("filename", "violin.dsp");
+		m->declare("filename", "Violin.dsp");
 		m->declare("filters.lib/fir:author", "Julius O. Smith III");
 		m->declare("filters.lib/fir:copyright", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
 		m->declare("filters.lib/fir:license", "MIT-style STK-4.3 license");
@@ -8067,7 +8067,7 @@ class mydsp : public dsp {
 		m->declare("maths.lib/license", "LGPL with exception");
 		m->declare("maths.lib/name", "Faust Math Library");
 		m->declare("maths.lib/version", "2.3");
-		m->declare("name", "violin");
+		m->declare("name", "Violin");
 		m->declare("noises.lib/name", "Faust Noise Generator Library");
 		m->declare("noises.lib/version", "0.0");
 		m->declare("platform.lib/name", "Generic Platform Library");
@@ -8082,7 +8082,7 @@ class mydsp : public dsp {
 		return 0;
 	}
 	virtual int getNumOutputs() {
-		return 2;
+		return 1;
 	}
 	virtual int getInputRate(int channel) {
 		int rate;
@@ -8098,10 +8098,6 @@ class mydsp : public dsp {
 		int rate;
 		switch ((channel)) {
 			case 0: {
-				rate = 1;
-				break;
-			}
-			case 1: {
 				rate = 1;
 				break;
 			}
@@ -8587,7 +8583,7 @@ class mydsp : public dsp {
 	}
 	
 	virtual void buildUserInterface(UI* ui_interface) {
-		ui_interface->openVerticalBox("violin");
+		ui_interface->openVerticalBox("Violin");
 		ui_interface->addHorizontalSlider("freq0", &fHslider8, 660.0f, 660.0f, 1100.0f, 0.00999999978f);
 		ui_interface->addHorizontalSlider("freq1", &fHslider6, 660.0f, 660.0f, 1100.0f, 0.00999999978f);
 		ui_interface->addHorizontalSlider("freq2", &fHslider3, 660.0f, 660.0f, 1100.0f, 0.00999999978f);
@@ -8609,7 +8605,6 @@ class mydsp : public dsp {
 	
 	virtual void compute(int count, FAUSTFLOAT** inputs, FAUSTFLOAT** outputs) {
 		FAUSTFLOAT* output0 = outputs[0];
-		FAUSTFLOAT* output1 = outputs[1];
 		float fSlow0 = (0.00100000005f * float(fHslider0));
 		float fSlow1 = float(fHslider1);
 		float fSlow2 = float(fButton0);
@@ -9209,9 +9204,7 @@ class mydsp : public dsp {
 			float fRec216 = fRec220;
 			fRec211[0] = fRec214;
 			float fRec212 = fRec216;
-			float fTemp325 = (fRec1 + (fRec35 + (fRec61 + (fRec94 + (fRec120 + ((fRec153 + fRec180) + fRec212))))));
-			output0[i] = FAUSTFLOAT(fTemp325);
-			output1[i] = FAUSTFLOAT(fTemp325);
+			output0[i] = FAUSTFLOAT((fRec1 + (fRec35 + (fRec61 + (fRec94 + (fRec120 + ((fRec153 + fRec180) + fRec212)))))));
 			iRec10[1] = iRec10[0];
 			fRec26[1] = fRec26[0];
 			fRec23[1] = fRec23[0];
@@ -9369,10 +9362,10 @@ class mydsp : public dsp {
 
 #ifdef FAUST_UIMACROS
 	
-	#define FAUST_FILE_NAME "violin.dsp"
+	#define FAUST_FILE_NAME "Violin.dsp"
 	#define FAUST_CLASS_NAME "mydsp"
 	#define FAUST_INPUTS 0
-	#define FAUST_OUTPUTS 2
+	#define FAUST_OUTPUTS 1
 	#define FAUST_ACTIVES 16
 	#define FAUST_PASSIVES 0
 
@@ -9430,7 +9423,7 @@ std::list<GUI*> GUI::fGuiList;
 ztimedmap GUI::gTimedZoneMap;
 #endif
 
-violin::violin() : AudioStream(FAUST_INPUTS, new audio_block_t*[FAUST_INPUTS])
+Violin::Violin() : AudioStream(FAUST_INPUTS, new audio_block_t*[FAUST_INPUTS])
 {
 #ifdef NVOICES
     int nvoices = NVOICES;
@@ -9476,7 +9469,7 @@ violin::violin() : AudioStream(FAUST_INPUTS, new audio_block_t*[FAUST_INPUTS])
 #endif
 }
 
-violin::~violin()
+Violin::~Violin()
 {
     delete fDSP;
     delete fUI;
@@ -9495,7 +9488,7 @@ violin::~violin()
 }
 
 template <int INPUTS, int OUTPUTS>
-void violin::updateImp(void)
+void Violin::updateImp(void)
 {
 #if MIDICTRL
     // Process the MIDI messages received by the Teensy
@@ -9532,14 +9525,14 @@ void violin::updateImp(void)
     }
 }
 
-void violin::update(void) { updateImp<FAUST_INPUTS, FAUST_OUTPUTS>(); }
+void Violin::update(void) { updateImp<FAUST_INPUTS, FAUST_OUTPUTS>(); }
 
-void violin::setParamValue(const std::string& path, float value)
+void Violin::setParamValue(const std::string& path, float value)
 {
     fUI->setParamValue(path, value);
 }
 
-float violin::getParamValue(const std::string& path)
+float Violin::getParamValue(const std::string& path)
 {
     return fUI->getParamValue(path);
 }
