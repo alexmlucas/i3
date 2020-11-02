@@ -16,7 +16,7 @@ boolean lastTouchFlags[] = {false, false, false, false};
 int touchLocations[] = {-1, -1, -1, -1};
 
 const char* freqParamNames[] = {"freq0", "freq1", "freq2", "freq3"};
-const char* pressureParamNames[] = {"velocity0", "velocity1", "velocity2", "velocity3"};
+const char* velocityParamNames[] = {"velocity0", "velocity1", "velocity2", "velocity3"};
 const char* pluckTriggerParamNames[] = {"pluckTrigger0", "pluckTrigger1", "pluckTrigger2", "pluckTrigger3"};
 const char* pluckGainParamNames[] = {"pluckGain0", "pluckGain1", "pluckGain2", "pluckGain3"};
 
@@ -30,7 +30,6 @@ elapsedMillis pluckResetTimers[] = {0, 0, 0, 0};
 
 float minStringFreqs[] = {196.00, 293.70, 440.00, 659.30};                // G3, D4, A4, E5 
 float maxStringFreqs[] = {277.18, 415.30, 622.25, 932.33};                // Db4, Ab4, Eb5, Bb5
-
 
 const int LED_PIN = 9;
 
@@ -56,19 +55,13 @@ AudioConnection          patchCord2(amp1, 0 , i2s1, 0);
 AudioConnection          patchCord3(amp1, 0 , i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;
 
-
 void setup()
 {
-  
   AudioMemory(2);
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.6);
   sgtl5000_1.lineOutLevel(13);
   amp1.gain(0.9);
-  
-
-  
-
   
   Serial.begin(9600);
   pinMode(pressureSensorPin, INPUT);
@@ -147,10 +140,10 @@ void loop()
         {        
           if(touchFlags[i] == true)
           {  
-            violin.setParamValue(pressureParamNames[i], bowPressureValue);      // apply pressure if the touch point is active.
+            violin.setParamValue(velocityParamNames[i], bowPressureValue);      // apply pressure if the touch point is active.
           } else 
           {
-            violin.setParamValue(pressureParamNames[i], 0);                     // otherwise set pressure to zero.
+            violin.setParamValue(velocityParamNames[i], 0);                     // otherwise set pressure to zero.
           }
         }
       }
@@ -158,7 +151,7 @@ void loop()
     { 
       for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                // set all to zero - to catch any events falling outside 50ms timer
       {
-        violin.setParamValue(pressureParamNames[i], 0);
+        violin.setParamValue(velocityParamNames[i], 0);
       }
     }
 

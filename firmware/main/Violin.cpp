@@ -8105,7 +8105,7 @@ class mydsp : public dsp {
     m->declare("filters.lib/iir:author", "Julius O. Smith III");
     m->declare("filters.lib/iir:copyright", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
     m->declare("filters.lib/iir:license", "MIT-style STK-4.3 license");
-    m->declare("filters.lib/lowpass0_highpass1", "MIT-style STK-4.3 license");
+    m->declare("filters.lib/lowpass0_highpass1", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
     m->declare("filters.lib/lowpass0_highpass1:author", "Julius O. Smith III");
     m->declare("filters.lib/lowpass:author", "Julius O. Smith III");
     m->declare("filters.lib/lowpass:copyright", "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>");
@@ -8141,7 +8141,7 @@ class mydsp : public dsp {
     return 0;
   }
   virtual int getNumOutputs() {
-    return 2;
+    return 1;
   }
   virtual int getInputRate(int channel) {
     int rate;
@@ -8157,10 +8157,6 @@ class mydsp : public dsp {
     int rate;
     switch ((channel)) {
       case 0: {
-        rate = 1;
-        break;
-      }
-      case 1: {
         rate = 1;
         break;
       }
@@ -8659,16 +8655,15 @@ class mydsp : public dsp {
     ui_interface->addButton("pluckTrigger1", &fButton3);
     ui_interface->addButton("pluckTrigger2", &fButton1);
     ui_interface->addButton("pluckTrigger3", &fButton0);
-    ui_interface->addHorizontalSlider("velocity0", &fHslider1, 0.0f, 0.0f, 0.0500000007f, 0.00100000005f);
-    ui_interface->addHorizontalSlider("velocity1", &fHslider3, 0.0f, 0.0f, 0.0500000007f, 0.00100000005f);
-    ui_interface->addHorizontalSlider("velocity2", &fHslider5, 0.0f, 0.0f, 0.0500000007f, 0.00100000005f);
-    ui_interface->addHorizontalSlider("velocity3", &fHslider7, 0.0f, 0.0f, 0.0500000007f, 0.00100000005f);
+    ui_interface->addHorizontalSlider("velocity0", &fHslider1, 0.0f, 0.0f, 0.100000001f, 0.00999999978f);
+    ui_interface->addHorizontalSlider("velocity1", &fHslider3, 0.0f, 0.0f, 0.100000001f, 0.00999999978f);
+    ui_interface->addHorizontalSlider("velocity2", &fHslider5, 0.0f, 0.0f, 0.100000001f, 0.00999999978f);
+    ui_interface->addHorizontalSlider("velocity3", &fHslider7, 0.0f, 0.0f, 0.100000001f, 0.00999999978f);
     ui_interface->closeBox();
   }
   
   virtual void compute(int count, FAUSTFLOAT** inputs, FAUSTFLOAT** outputs) {
     FAUSTFLOAT* output0 = outputs[0];
-    FAUSTFLOAT* output1 = outputs[1];
     float fSlow0 = (0.00100000005f * float(fHslider0));
     float fSlow1 = (0.00100000005f * mydsp_faustpower2_f(float(fHslider1)));
     float fSlow2 = (0.00100000005f * float(fHslider2));
@@ -9268,9 +9263,7 @@ class mydsp : public dsp {
       float fRec210 = fRec214;
       fRec205[0] = fRec208;
       float fRec206 = fRec210;
-      float fTemp325 = ((0.25f * ((fRec1 + fRec28) + (fRec55 + fRec82))) + (fRec109 + (fRec142 + (fRec174 + fRec206))));
-      output0[i] = FAUSTFLOAT(fTemp325);
-      output1[i] = FAUSTFLOAT(fTemp325);
+      output0[i] = FAUSTFLOAT(((0.150000006f * ((fRec1 + fRec28) + (fRec55 + fRec82))) + (fRec109 + (fRec142 + (fRec174 + fRec206)))));
       iRec10[1] = iRec10[0];
       fRec23[1] = fRec23[0];
       fRec20[1] = fRec20[0];
@@ -9431,7 +9424,7 @@ class mydsp : public dsp {
   #define FAUST_FILE_NAME "Violin.dsp"
   #define FAUST_CLASS_NAME "mydsp"
   #define FAUST_INPUTS 0
-  #define FAUST_OUTPUTS 2
+  #define FAUST_OUTPUTS 1
   #define FAUST_ACTIVES 16
   #define FAUST_PASSIVES 0
 
@@ -9447,10 +9440,10 @@ class mydsp : public dsp {
   FAUST_ADDBUTTON("pluckTrigger1", fButton3);
   FAUST_ADDBUTTON("pluckTrigger2", fButton1);
   FAUST_ADDBUTTON("pluckTrigger3", fButton0);
-  FAUST_ADDHORIZONTALSLIDER("velocity0", fHslider1, 0.0f, 0.0f, 0.050000000000000003f, 0.001f);
-  FAUST_ADDHORIZONTALSLIDER("velocity1", fHslider3, 0.0f, 0.0f, 0.050000000000000003f, 0.001f);
-  FAUST_ADDHORIZONTALSLIDER("velocity2", fHslider5, 0.0f, 0.0f, 0.050000000000000003f, 0.001f);
-  FAUST_ADDHORIZONTALSLIDER("velocity3", fHslider7, 0.0f, 0.0f, 0.050000000000000003f, 0.001f);
+  FAUST_ADDHORIZONTALSLIDER("velocity0", fHslider1, 0.0f, 0.0f, 0.10000000000000001f, 0.01f);
+  FAUST_ADDHORIZONTALSLIDER("velocity1", fHslider3, 0.0f, 0.0f, 0.10000000000000001f, 0.01f);
+  FAUST_ADDHORIZONTALSLIDER("velocity2", fHslider5, 0.0f, 0.0f, 0.10000000000000001f, 0.01f);
+  FAUST_ADDHORIZONTALSLIDER("velocity3", fHslider7, 0.0f, 0.0f, 0.10000000000000001f, 0.01f);
 
   #define FAUST_LIST_ACTIVES(p) \
     p(HORIZONTALSLIDER, freq0, "freq0", fHslider0, 660.0f, 660.0f, 1100.0f, 0.01f) \
@@ -9465,10 +9458,10 @@ class mydsp : public dsp {
     p(BUTTON, pluckTrigger1, "pluckTrigger1", fButton3, 0.0, 0.0, 1.0, 1.0) \
     p(BUTTON, pluckTrigger2, "pluckTrigger2", fButton1, 0.0, 0.0, 1.0, 1.0) \
     p(BUTTON, pluckTrigger3, "pluckTrigger3", fButton0, 0.0, 0.0, 1.0, 1.0) \
-    p(HORIZONTALSLIDER, velocity0, "velocity0", fHslider1, 0.0f, 0.0f, 0.050000000000000003f, 0.001f) \
-    p(HORIZONTALSLIDER, velocity1, "velocity1", fHslider3, 0.0f, 0.0f, 0.050000000000000003f, 0.001f) \
-    p(HORIZONTALSLIDER, velocity2, "velocity2", fHslider5, 0.0f, 0.0f, 0.050000000000000003f, 0.001f) \
-    p(HORIZONTALSLIDER, velocity3, "velocity3", fHslider7, 0.0f, 0.0f, 0.050000000000000003f, 0.001f) \
+    p(HORIZONTALSLIDER, velocity0, "velocity0", fHslider1, 0.0f, 0.0f, 0.10000000000000001f, 0.01f) \
+    p(HORIZONTALSLIDER, velocity1, "velocity1", fHslider3, 0.0f, 0.0f, 0.10000000000000001f, 0.01f) \
+    p(HORIZONTALSLIDER, velocity2, "velocity2", fHslider5, 0.0f, 0.0f, 0.10000000000000001f, 0.01f) \
+    p(HORIZONTALSLIDER, velocity3, "velocity3", fHslider7, 0.0f, 0.0f, 0.10000000000000001f, 0.01f) \
 
   #define FAUST_LIST_PASSIVES(p) \
 
