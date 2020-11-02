@@ -122,7 +122,6 @@ void loop()
     int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);       // read the pressure sensor
     //int pressureValue = analogRead(pressureSensorPin);       // read the pressure sensor
 
-
     Serial.println(pressureValue);
 
     if(pressureValue > PRESSURE_THRESHOLD)                                      // is pressure being applied?
@@ -184,12 +183,17 @@ void loop()
           pluckResetTimers[i] = 0;
         }
 
-        pressureWasApplied = false;                                             // reset
         maxTouchSizes[i] = 0;
       }
     }
 
-    for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                  // update lastTouchFlag[] states.
+    if(!touchFlags[0] && !touchFlags[1] && !touchFlags[2] && !touchFlags[3])
+    {
+      pressureWasApplied = false;                                             // reset (only reset if all touches have been released)
+    }
+    
+
+    for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                // update lastTouchFlag[] states.
     {
       lastTouchFlags[i] = touchFlags[i];
     }
