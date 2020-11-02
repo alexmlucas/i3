@@ -1,6 +1,10 @@
 
 #include <Trill.h>
 #include<Audio.h>
+#include <Wire.h>
+#include <SD.h>
+#include <SPI.h>
+#include <SerialFlash.h>
 
 #include "Violin.h"
 
@@ -12,12 +16,12 @@ boolean lastTouchFlags[] = {false, false, false, false};
 int touchLocations[] = {-1, -1, -1, -1};
 
 const char* freqParamNames[] = {"freq0", "freq1", "freq2", "freq3"};
-const char* pressureParamNames[] = {"pressure0", "pressure1", "pressure2", "pressure3"};
+const char* pressureParamNames[] = {"velocity0", "velocity1", "velocity2", "velocity3"};
 const char* pluckTriggerParamNames[] = {"pluckTrigger0", "pluckTrigger1", "pluckTrigger2", "pluckTrigger3"};
 const char* pluckGainParamNames[] = {"pluckGain0", "pluckGain1", "pluckGain2", "pluckGain3"};
 
 int maxTouchSizes[] = {-1, -1, -1, -1};
-const int PRESSURE_THRESHOLD = 20;
+const int PRESSURE_THRESHOLD = 400;
 const int PRESSURE_NOISE_FILTER = 10;
 elapsedMillis sensorReadTimer;
 
@@ -26,6 +30,9 @@ elapsedMillis pluckResetTimers[] = {0, 0, 0, 0};
 
 float minStringFreqs[] = {196.00, 293.70, 440.00, 659.30};                // G3, D4, A4, E5 
 float maxStringFreqs[] = {277.18, 415.30, 622.25, 932.33};                // Db4, Ab4, Eb5, Bb5
+
+
+const int LED_PIN = 9;
 
 Violin violin;
 
@@ -43,30 +50,48 @@ int maxTouchSize = 0;
 float bowPressureValue = 0;
 
 AudioAmplifier           amp1;          
-AudioOutputI2S           i2s1;          
+AudioOutputI2S           i2s1;
 AudioConnection          patchCord1(violin, amp1);
-AudioConnection          patchCord2(amp1, 0, i2s1, 0);
-AudioConnection          patchCord3(amp1, 0, i2s1, 1);
+AudioConnection          patchCord2(amp1, 0 , i2s1, 0);
+AudioConnection          patchCord3(amp1, 0 , i2s1, 1);
+AudioControlSGTL5000     sgtl5000_1;
+
 
 void setup()
 {
-  Serial.begin(9600);
-  pinMode(A3, INPUT);
+  
   AudioMemory(2);
-  amp1.gain(0.1);
+  sgtl5000_1.enable();
+  sgtl5000_1.volume(0.6);
+  sgtl5000_1.lineOutLevel(13);
+  amp1.gain(0.9);
+  
 
+  
+
+  
+  Serial.begin(9600);
+  pinMode(pressureSensorPin, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  
   for(int i = 0; i < NUM_TRILL_SENSORS; i++)
   {
     trillSensors[i].begin(Trill::TRILL_BAR, trillAddresses[i]);
+    trillSensors[i].setPrescaler(4); // a value from 1-8
+    //trillSensors[i].setThreshold(2); // a value from 0 - 255
   }
 
+  digitalWrite(LED_PIN, HIGH);
+
   delay(1000);
+
+  Serial.println("we're running");
 }
 
 void loop() 
 {
   
-  if(touchReadTimer > 50)                                                                       // read 20 times per second.
+  if(touchReadTimer > 10)                                                                       // read 20 times per second.
   {
     // ### * CHECK FOR TOUCHES * ###
     
@@ -76,10 +101,10 @@ void loop()
 
       if(trillSensors[i].getNumTouches() > 0)
       {
-        Serial.print("Touch at Trill address ");
-        Serial.print(trillAddresses[i]);
+        /*Serial.print("Touch at Trill address ");
+        Serial.print(trillAddresses[i], HEX);
         Serial.print(" = ");
-        Serial.println(trillSensors[i].touchLocation(0));
+        Serial.println(trillSensors[i].touchLocation(0));*/
 
         touchFlags[i] = true;
         touchLocations[i] = trillSensors[i].touchLocation(0);                                                             // get the location of the first touch.
@@ -101,7 +126,11 @@ void loop()
 
     // ### * CHECK FOR PRESSURE * ###
     
-    int pressureValue = constrain(analogRead(pressureSensorPin), 0, 900);       // read the pressure sensor
+    int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);       // read the pressure sensor
+    //int pressureValue = analogRead(pressureSensorPin);       // read the pressure sensor
+
+
+    Serial.println(pressureValue);
 
     if(pressureValue > PRESSURE_THRESHOLD)                                      // is pressure being applied?
     {
@@ -112,7 +141,7 @@ void loop()
         lastPressureValue = pressureValue;                                      // store value for next iteration.
         bowPressureValue = pressureValue / 1000.0;                              // map to a value appropriate for bow pressure
 
-        Serial.println(bowPressureValue);
+        //Serial.println(bowPressureValue);
         
         for(int i = 0; i < NUM_TRILL_SENSORS; i++)
         {        
