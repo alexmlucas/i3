@@ -28,8 +28,8 @@ elapsedMillis sensorReadTimer;
 boolean pluckResetFlags[] = {false, false, false, false};
 elapsedMillis pluckResetTimers[] = {0, 0, 0, 0};
 
-float minStringFreqs[] = {196.00, 293.70, 440.00, 659.30};                // G3, D4, A4, E5 
-float maxStringFreqs[] = {277.18, 415.30, 622.25, 932.33};                // Db4, Ab4, Eb5, Bb5
+float minStringFreqs[] = {196.00, 293.67, 440.00, 659.46};                // G3, D4, A4, E5 
+float maxStringFreqs[] = {261.63, 392, 587.33, 987.77};                   // C4, G4, D5, B5
 
 const int LED_PIN = 9;
 
@@ -94,21 +94,31 @@ void loop()
 
       if(trillSensors[i].getNumTouches() > 0)
       {
-        /*Serial.print("Touch at Trill address ");
+        Serial.print("Touch at Trill address ");
         Serial.print(trillAddresses[i], HEX);
         Serial.print(" = ");
-        Serial.println(trillSensors[i].touchLocation(0));*/
+        Serial.println(trillSensors[i].touchLocation(0));
 
         touchFlags[i] = true;
-        touchLocations[i] = trillSensors[i].touchLocation(0);                                                             // get the location of the first touch.
-        violin.setParamValue(freqParamNames[i], map(touchLocations[i], 0, 3200, maxStringFreqs[i], minStringFreqs[i]));   // set string frequency.
+        touchLocations[i] = trillSensors[i].touchLocation(0);
+        
+        if(touchLocations[i] >= 2880)                                   // if touch within first 10 cm if strip, assign lowest freq
+        {
+          violin.setParamValue(freqParamNames[i], minStringFreqs[i]);   
+        } else if (touchLocations[i] <= 320)                            // if touch within last 10 cm if strip, assign highest freq
+        {
+          violin.setParamValue(freqParamNames[i], maxStringFreqs[i]);  
+        } else                                                          // otherwise, just assign mapped freq
+        {
+          violin.setParamValue(freqParamNames[i], map(touchLocations[i], 320, 2880, maxStringFreqs[i], minStringFreqs[i]));   
+        }
+        
+        int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);                                            // get a constrained version of the touch size
 
-        int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);                                          // get a constrained version of the touch size
-
-        if(currentTouchSize > maxTouchSizes[i])                                                                           // get the largest touch size during this touch event.
+        if(currentTouchSize > maxTouchSizes[i])                                                                             // get the largest touch size during this touch event.
         {
           maxTouchSizes[i] = currentTouchSize;
-          Serial.println(maxTouchSizes[i]);                            
+          //Serial.println(maxTouchSizes[i]);                            
         }
         
       } else                                                                                    // no touch is present so reset variables
@@ -122,13 +132,13 @@ void loop()
     int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);       // read the pressure sensor
     //int pressureValue = analogRead(pressureSensorPin);       // read the pressure sensor
 
-    Serial.println(pressureValue);
+    //Serial.println(pressureValue);
 
     if(pressureValue > PRESSURE_THRESHOLD)                                      // is pressure being applied?
-    {
+    {      
       pressureWasApplied = true;
-      
-      if(pressureValue > (lastPressureValue + PRESSURE_NOISE_FILTER) || pressureValue < (lastPressureValue - PRESSURE_NOISE_FILTER))      // filter noise
+     
+      if(pressureValue > (lastPressureValue + PRESSURE_NOISE_FILTER) | pressureValue < (lastPressureValue - PRESSURE_NOISE_FILTER) | pressureValue == 1000)      // filter noise
       {  
         lastPressureValue = pressureValue;                                      // store value for next iteration.
         bowPressureValue = pressureValue / 1000.0;                              // map to a value appropriate for bow pressure
