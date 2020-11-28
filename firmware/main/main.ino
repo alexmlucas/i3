@@ -21,15 +21,15 @@ const char* pluckTriggerParamNames[] = {"pluckTrigger0", "pluckTrigger1", "pluck
 const char* pluckGainParamNames[] = {"pluckGain0", "pluckGain1", "pluckGain2", "pluckGain3"};
 
 int maxTouchSizes[] = {-1, -1, -1, -1};
-const int PRESSURE_THRESHOLD = 400;
+const int PRESSURE_THRESHOLD = 150;
 const int PRESSURE_NOISE_FILTER = 10;
 elapsedMillis sensorReadTimer;
 
 boolean pluckResetFlags[] = {false, false, false, false};
 elapsedMillis pluckResetTimers[] = {0, 0, 0, 0};
 
-float minStringFreqs[] = {196.00, 293.67, 440.00, 659.46};                // G3, D4, A4, E5 
-float maxStringFreqs[] = {261.63, 392, 587.33, 987.77};                   // C4, G4, D5, B5
+int minStringFreqs[] = {19600, 29367, 44000, 65946};                // G3, D4, A4, E5 
+int maxStringFreqs[] = {26163, 39200, 58733, 98777};                // C4, G4, D5, B5
 
 const int LED_PIN = 9;
 
@@ -84,7 +84,7 @@ void setup()
 void loop() 
 {
   
-  if(touchReadTimer > 10)                                                                       // read 20 times per second.
+  if(touchReadTimer > 10)                                                           // read 20 times per second.
   {
     // ### * CHECK FOR TOUCHES * ###
     
@@ -94,71 +94,66 @@ void loop()
 
       if(trillSensors[i].getNumTouches() > 0)
       {
-        Serial.print("Touch at Trill address ");
+        /*Serial.print("Touch at Trill address ");
         Serial.print(trillAddresses[i], HEX);
         Serial.print(" = ");
-        Serial.println(trillSensors[i].touchLocation(0));
+        Serial.println(trillSensors[i].touchLocation(0));*/
 
         touchFlags[i] = true;
         touchLocations[i] = trillSensors[i].touchLocation(0);
         
-        if(touchLocations[i] >= 2880)                                   // if touch within first 10 cm if strip, assign lowest freq
+        if(touchLocations[i] >= 2880)                                               // if touch within first 10 cm if strip, assign lowest freq
         {
-          violin.setParamValue(freqParamNames[i], minStringFreqs[i]);   
-        } else if (touchLocations[i] <= 320)                            // if touch within last 10 cm if strip, assign highest freq
+          violin.setParamValue(freqParamNames[i], minStringFreqs[i] / 100.0);  
+        } else if (touchLocations[i] <= 320)                                        // if touch within last 10 cm if strip, assign highest freq
         {
-          violin.setParamValue(freqParamNames[i], maxStringFreqs[i]);  
-        } else                                                          // otherwise, just assign mapped freq
+          violin.setParamValue(freqParamNames[i], maxStringFreqs[i] / 100.0);
+        } else                                                                      // otherwise, just assign mapped freq
         {
-          violin.setParamValue(freqParamNames[i], map(touchLocations[i], 320, 2880, maxStringFreqs[i], minStringFreqs[i]));   
+          violin.setParamValue(freqParamNames[i], map(touchLocations[i], 320, 2880, maxStringFreqs[i], minStringFreqs[i]) / 100.0);
         }
-        
-        int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);                                            // get a constrained version of the touch size
+ 
+        int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);    // get a constrained version of the touch size
 
-        if(currentTouchSize > maxTouchSizes[i])                                                                             // get the largest touch size during this touch event.
+        if(currentTouchSize > maxTouchSizes[i])                                     // get the largest touch size during this touch event.
         {
-          maxTouchSizes[i] = currentTouchSize;
-          //Serial.println(maxTouchSizes[i]);                            
+          maxTouchSizes[i] = currentTouchSize;                           
         }
         
-      } else                                                                                    // no touch is present so reset variables
+      } else                                                                        // no touch is present so reset variables
       {
         touchFlags[i] = false;
       }
     }
-
     // ### * CHECK FOR PRESSURE * ###
     
-    int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);       // read the pressure sensor
-    //int pressureValue = analogRead(pressureSensorPin);       // read the pressure sensor
+    int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);          // read the pressure sensor
 
-    //Serial.println(pressureValue);
-
-    if(pressureValue > PRESSURE_THRESHOLD)                                      // is pressure being applied?
+    if(pressureValue > PRESSURE_THRESHOLD)                                          // is pressure being applied?
     {      
       pressureWasApplied = true;
      
       if(pressureValue > (lastPressureValue + PRESSURE_NOISE_FILTER) | pressureValue < (lastPressureValue - PRESSURE_NOISE_FILTER) | pressureValue == 1000)      // filter noise
       {  
-        lastPressureValue = pressureValue;                                      // store value for next iteration.
-        bowPressureValue = pressureValue / 1000.0;                              // map to a value appropriate for bow pressure
+        lastPressureValue = pressureValue;                                          // store value for next iteration.
 
-        //Serial.println(bowPressureValue);
+        pressureValue = map(pressureValue, PRESSURE_THRESHOLD, 1000, 0, 1000);                                    // remove the threshold.
+        bowPressureValue = pressureValue / 1000.0;                                  // map to a value appropriate for bow pressure
         
         for(int i = 0; i < NUM_TRILL_SENSORS; i++)
         {        
           if(touchFlags[i] == true)
           {  
-            violin.setParamValue(velocityParamNames[i], bowPressureValue);      // apply pressure if the touch point is active.
+            violin.setParamValue(velocityParamNames[i], bowPressureValue);          // apply pressure if the touch point is active.
           } else 
           {
-            violin.setParamValue(velocityParamNames[i], 0);                     // otherwise set pressure to zero.
+            violin.setParamValue(velocityParamNames[i], 0);                         // otherwise set pressure to zero.
           }
         }
       }
     } else                                                                      
     { 
-      for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                // set all to zero - to catch any events falling outside 50ms timer
+      for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                    // set all to zero - to catch any events falling outside 50ms timer
       {
         violin.setParamValue(velocityParamNames[i], 0);
       }
@@ -168,25 +163,20 @@ void loop()
 
     for(int i = 0; i < NUM_TRILL_SENSORS; i++)
     {
-      if(touchFlags[i] == false && lastTouchFlags[i] == true)                   // pluck if a transition from true to false has occured and no pressure has been applied.
+      if(touchFlags[i] == false && lastTouchFlags[i] == true)                       // pluck if a transition from true to false has occured and no pressure has been applied.
       {
-        Serial.println("release");
-
         if(pressureWasApplied == false)                    
         {
-          Serial.println("no pressure applied");
           String pluckGain = "pluckGain";
           String pluckTrigger = "pluckTrigger";
 
           pluckGain += i;
           pluckTrigger += i;
 
-          float gainValue = map(maxTouchSizes[i], 0, 6000, 0, 100) / 100.0;
+          float gainValue = map(maxTouchSizes[i], 0, 3000, 0, 100) / 100.0;
 
-          Serial.print("gainValue = ");
-          Serial.println(gainValue);
-
-          violin.setParamValue(pluckGainParamNames[i], 0.9);                    
+       
+          violin.setParamValue(pluckGainParamNames[i], gainValue);                    
           violin.setParamValue(pluckTriggerParamNames[i], 1);
 
           pluckResetFlags[i] = true;
@@ -202,16 +192,14 @@ void loop()
       pressureWasApplied = false;                                             // reset (only reset if all touches have been released)
     }
     
-
     for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                // update lastTouchFlag[] states.
     {
       lastTouchFlags[i] = touchFlags[i];
     }
-
     touchReadTimer = 0;
   }
 
-  for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                    // needed to switch off pluck 0/1 switch
+  for(int i = 0; i < NUM_TRILL_SENSORS; i++)                                  // needed to switch off pluck 0/1 switch
   {
     if(pluckResetFlags[i])
     {
