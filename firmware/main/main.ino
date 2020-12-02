@@ -137,7 +137,7 @@ void loop()
       {  
         lastPressureValue = pressureValue;                                          // store value for next iteration.
 
-        pressureValue = map(pressureValue, PRESSURE_THRESHOLD, 1000, 0, 1000);                                    // remove the threshold.
+        pressureValue = map(pressureValue, PRESSURE_THRESHOLD, 1000, 0, 1000);      // remove the threshold.
         bowPressureValue = pressureValue / 1000.0;                                  // map to a value appropriate for bow pressure
         
         for(int i = 0; i < NUM_TRILL_SENSORS; i++)
@@ -175,7 +175,6 @@ void loop()
 
           float gainValue = map(maxTouchSizes[i], 0, 3000, 0, 100) / 100.0;
 
-       
           violin.setParamValue(pluckGainParamNames[i], gainValue);                    
           violin.setParamValue(pluckTriggerParamNames[i], 1);
 
