@@ -21,15 +21,15 @@ const char* pluckTriggerParamNames[] = {"pluckTrigger0", "pluckTrigger1", "pluck
 const char* pluckGainParamNames[] = {"pluckGain0", "pluckGain1", "pluckGain2", "pluckGain3"};
 
 int maxTouchSizes[] = {-1, -1, -1, -1};
-const int PRESSURE_THRESHOLD = 150;
+const int PRESSURE_THRESHOLD = 200;
 const int PRESSURE_NOISE_FILTER = 10;
 elapsedMillis sensorReadTimer;
 
 boolean pluckResetFlags[] = {false, false, false, false};
 elapsedMillis pluckResetTimers[] = {0, 0, 0, 0};
 
-int minStringFreqs[] = {19600, 29367, 44000, 65946};                // G3, D4, A4, E5 
-int maxStringFreqs[] = {26163, 39200, 58733, 98777};                // C4, G4, D5, B5
+int minStringFreqs[] = {19600, 29367, 44000, 65926};                // G3, D4, A4, E5 
+int maxStringFreqs[] = {26163, 39200, 58733, 88000};                // C4, G4, D5, B5
 
 const int LED_PIN = 9;
 
@@ -104,13 +104,16 @@ void loop()
         
         if(touchLocations[i] >= 2880)                                               // if touch within first 10 cm if strip, assign lowest freq
         {
-          violin.setParamValue(freqParamNames[i], minStringFreqs[i] / 100.0);  
+          violin.setParamValue(freqParamNames[i], minStringFreqs[i] / 100.0);       // divide between 100 to get float
+          //Serial.println(minStringFreqs[i] / 100.0);
         } else if (touchLocations[i] <= 320)                                        // if touch within last 10 cm if strip, assign highest freq
         {
           violin.setParamValue(freqParamNames[i], maxStringFreqs[i] / 100.0);
+          //Serial.println(maxStringFreqs[i] / 100.0);
         } else                                                                      // otherwise, just assign mapped freq
         {
           violin.setParamValue(freqParamNames[i], map(touchLocations[i], 320, 2880, maxStringFreqs[i], minStringFreqs[i]) / 100.0);
+          //Serial.println(map(touchLocations[i], 320, 2880, maxStringFreqs[i], minStringFreqs[i]) / 100.0);
         }
  
         int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);    // get a constrained version of the touch size
@@ -128,6 +131,8 @@ void loop()
     // ### * CHECK FOR PRESSURE * ###
     
     int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);          // read the pressure sensor
+
+    //Serial.println(pressureValue);
 
     if(pressureValue > PRESSURE_THRESHOLD)                                          // is pressure being applied?
     {      

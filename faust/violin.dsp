@@ -48,10 +48,10 @@ pluckTrigger2 = button("pluckTrigger2");
 pluckGain3 = hslider("pluckGain3", 0.7, 0, 1, 0.01);
 pluckTrigger3 = button("pluckTrigger3");
 
-process = ((violinBowedModel(freq0, 0, velocity0, 0.75) *(velocity0) *(0.2), violinPluckedModel(freq0, pluckGain0, pluckTrigger0) *(pluckGain0): + ), 
+process = ((violinBowedModel(freq0, velocity0, velocity0, 0.75) *(velocity0) *(0.2), violinPluckedModel(freq0, pluckGain0, pluckTrigger0) *(pluckGain0): + ), 
 
-(violinBowedModel(freq1, 0, velocity1, 0.75) *(velocity1) *(0.2), violinPluckedModel(freq1, pluckGain1, pluckTrigger1) *(pluckGain1): + ) : + ), 
+(violinBowedModel(freq1, velocity0, velocity1, 0.75) *(velocity1) *(0.2), violinPluckedModel(freq1, pluckGain1, pluckTrigger1) *(pluckGain1): + ) : + ), 
 
-((violinBowedModel(freq2, 0, velocity2, 0.75) *(velocity2) *(0.2), violinPluckedModel(freq2, pluckGain2, pluckTrigger2) *(pluckGain2): + ), 
+((violinBowedModel(freq2, velocity0, velocity2, 0.75) *(velocity2) *(0.2), violinPluckedModel(freq2, pluckGain2, pluckTrigger2) *(pluckGain2): + ), 
 
-(violinBowedModel(freq3, 0, velocity3, 0.75) *(velocity3) *(0.2), violinPluckedModel(freq3, pluckGain3, pluckTrigger3) *(pluckGain3): + ) : + ) : +;
+(violinBowedModel(freq3, velocity0, velocity3, 0.75) *(velocity3) *(0.2), violinPluckedModel(freq3, pluckGain3, pluckTrigger3) *(pluckGain3): + ) : + ) : +;

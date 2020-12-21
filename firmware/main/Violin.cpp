@@ -8750,7 +8750,7 @@ class mydsp : public dsp {
       int iTemp57 = int(std::min<float>(fConst5, float(std::max<int>(0, (iTemp34 + 4)))));
       fVec0[0] = (((((fRec26[((IOTA - (iTemp35 + 2)) & 2047)] * fTemp38) * fTemp40) * fTemp42) * fTemp44) + (fTemp45 * ((((((fRec26[((IOTA - (iTemp46 + 2)) & 2047)] * fTemp47) * fTemp48) * fTemp49) + (0.5f * (((fTemp37 * fRec26[((IOTA - (iTemp50 + 2)) & 2047)]) * fTemp51) * fTemp52))) + (0.166666672f * ((fTemp53 * fRec26[((IOTA - (iTemp54 + 2)) & 2047)]) * fTemp55))) + (0.0416666679f * (fTemp56 * fRec26[((IOTA - (iTemp57 + 2)) & 2047)])))));
       float fTemp58 = (fRec0[0] - (fRec21[1] + fVec0[1]));
-      float fTemp59 = (fTemp58 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs((5.0f * fTemp58)) + 0.75f)))));
+      float fTemp59 = (fTemp58 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs(((5.0f - (4.0f * fRec0[0])) * fTemp58)) + 0.75f)))));
       float fRec22 = (fRec21[1] + fTemp59);
       float fTemp60 = (((fTemp8 * fTemp10) * fTemp12) * fTemp14);
       float fTemp61 = (fVec0[1] + fTemp59);
@@ -8854,7 +8854,7 @@ class mydsp : public dsp {
       int iTemp132 = int(std::min<float>(fConst5, float(std::max<int>(0, (iTemp109 + 4)))));
       fVec2[0] = (((((fRec53[((IOTA - (iTemp110 + 2)) & 2047)] * fTemp113) * fTemp115) * fTemp117) * fTemp119) + (fTemp120 * ((((((fRec53[((IOTA - (iTemp121 + 2)) & 2047)] * fTemp122) * fTemp123) * fTemp124) + (0.5f * (((fTemp112 * fRec53[((IOTA - (iTemp125 + 2)) & 2047)]) * fTemp126) * fTemp127))) + (0.166666672f * ((fTemp128 * fRec53[((IOTA - (iTemp129 + 2)) & 2047)]) * fTemp130))) + (0.0416666679f * (fTemp131 * fRec53[((IOTA - (iTemp132 + 2)) & 2047)])))));
       float fTemp133 = (fRec27[0] - (fRec48[1] + fVec2[1]));
-      float fTemp134 = (fTemp133 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs((5.0f * fTemp133)) + 0.75f)))));
+      float fTemp134 = (fTemp133 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs(((5.0f - (4.0f * fRec27[0])) * fTemp133)) + 0.75f)))));
       float fRec49 = (fRec48[1] + fTemp134);
       float fTemp135 = (((fTemp83 * fTemp85) * fTemp87) * fTemp89);
       float fTemp136 = (fVec2[1] + fTemp134);
@@ -8958,7 +8958,7 @@ class mydsp : public dsp {
       int iTemp207 = int(std::min<float>(fConst5, float(std::max<int>(0, (iTemp184 + 4)))));
       fVec4[0] = (((((fRec80[((IOTA - (iTemp185 + 2)) & 2047)] * fTemp188) * fTemp190) * fTemp192) * fTemp194) + (fTemp195 * ((((((fRec80[((IOTA - (iTemp196 + 2)) & 2047)] * fTemp197) * fTemp198) * fTemp199) + (0.5f * (((fTemp187 * fRec80[((IOTA - (iTemp200 + 2)) & 2047)]) * fTemp201) * fTemp202))) + (0.166666672f * ((fTemp203 * fRec80[((IOTA - (iTemp204 + 2)) & 2047)]) * fTemp205))) + (0.0416666679f * (fTemp206 * fRec80[((IOTA - (iTemp207 + 2)) & 2047)])))));
       float fTemp208 = (fRec54[0] - (fRec75[1] + fVec4[1]));
-      float fTemp209 = (fTemp208 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs((5.0f * fTemp208)) + 0.75f)))));
+      float fTemp209 = (fTemp208 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs(((5.0f - (4.0f * fRec54[0])) * fTemp208)) + 0.75f)))));
       float fRec76 = (fRec75[1] + fTemp209);
       float fTemp210 = (((fTemp158 * fTemp160) * fTemp162) * fTemp164);
       float fTemp211 = (fVec4[1] + fTemp209);
@@ -9062,7 +9062,7 @@ class mydsp : public dsp {
       int iTemp282 = int(std::min<float>(fConst5, float(std::max<int>(0, (iTemp259 + 4)))));
       fVec6[0] = (((((fRec107[((IOTA - (iTemp260 + 2)) & 2047)] * fTemp263) * fTemp265) * fTemp267) * fTemp269) + (fTemp270 * ((((((fRec107[((IOTA - (iTemp271 + 2)) & 2047)] * fTemp272) * fTemp273) * fTemp274) + (0.5f * (((fTemp262 * fRec107[((IOTA - (iTemp275 + 2)) & 2047)]) * fTemp276) * fTemp277))) + (0.166666672f * ((fTemp278 * fRec107[((IOTA - (iTemp279 + 2)) & 2047)]) * fTemp280))) + (0.0416666679f * (fTemp281 * fRec107[((IOTA - (iTemp282 + 2)) & 2047)])))));
       float fTemp283 = (fRec81[0] - (fRec102[1] + fVec6[1]));
-      float fTemp284 = (fTemp283 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs((5.0f * fTemp283)) + 0.75f)))));
+      float fTemp284 = (fTemp283 * std::min<float>(1.0f, (1.0f / mydsp_faustpower4_f((std::fabs(((5.0f - (4.0f * fRec81[0])) * fTemp283)) + 0.75f)))));
       float fRec103 = (fRec102[1] + fTemp284);
       float fTemp285 = (((fTemp233 * fTemp235) * fTemp237) * fTemp239);
       float fTemp286 = (fVec6[1] + fTemp284);
