@@ -71,7 +71,6 @@ void setup()
   {
     trillSensors[i].begin(Trill::TRILL_BAR, trillAddresses[i]);
     trillSensors[i].setPrescaler(4); // a value from 1-8
-    //trillSensors[i].setThreshold(2); // a value from 0 - 255
   }
 
   digitalWrite(LED_PIN, HIGH);
@@ -94,26 +93,18 @@ void loop()
 
       if(trillSensors[i].getNumTouches() > 0)
       {
-        /*Serial.print("Touch at Trill address ");
-        Serial.print(trillAddresses[i], HEX);
-        Serial.print(" = ");
-        Serial.println(trillSensors[i].touchLocation(0));*/
-
         touchFlags[i] = true;
         touchLocations[i] = trillSensors[i].touchLocation(0);
         
         if(touchLocations[i] >= 2880)                                               // if touch within first 10 cm if strip, assign lowest freq
         {
           violin.setParamValue(freqParamNames[i], maxStringFreqs[i] / 100.0);       // divide between 100 to get float
-          //Serial.println(minStringFreqs[i] / 100.0);
         } else if (touchLocations[i] <= 320)                                        // if touch within last 10 cm if strip, assign highest freq
         {
           violin.setParamValue(freqParamNames[i], minStringFreqs[i] / 100.0);
-          //Serial.println(maxStringFreqs[i] / 100.0);
         } else                                                                      // otherwise, just assign mapped freq
         {
           violin.setParamValue(freqParamNames[i], map(touchLocations[i], 320, 2880, minStringFreqs[i], maxStringFreqs[i]) / 100.0);
-          //Serial.println(map(touchLocations[i], 320, 2880, maxStringFreqs[i], minStringFreqs[i]) / 100.0);
         }
  
         int currentTouchSize = constrain(trillSensors[i].touchSize(0), 0, 6000);    // get a constrained version of the touch size
@@ -131,8 +122,6 @@ void loop()
     // ### * CHECK FOR PRESSURE * ###
     
     int pressureValue = constrain(analogRead(pressureSensorPin), 0, 1000);          // read the pressure sensor
-
-    //Serial.println(pressureValue);
 
     if(pressureValue > PRESSURE_THRESHOLD)                                          // is pressure being applied?
     {      
